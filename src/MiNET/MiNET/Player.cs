@@ -71,6 +71,7 @@ namespace MiNET
 		public GameMode GameMode { get; set; }
 		public bool UseCreativeInventory { get; set; } = true;
 		public bool IsConnected { get; set; }
+		public bool IsLobby { get; set; }
 		public CertificateData CertificateData { get; set; }
 		public string Username { get; set; }
 		public string DisplayName { get; set; }
