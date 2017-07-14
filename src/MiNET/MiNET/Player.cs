@@ -1623,10 +1623,13 @@ namespace MiNET
 
 				if (droppedItem.Count == 0) return; // 0.15 bug
 
-				if (!VerifyItemStack(droppedItem)) return;
+				
+				if(!VerifyItemStack(droppedItem)){
+				    Disconnect("Inventory hacking");
+				}
 
 				// Clear current inventory slot.
-
+                                if(GameMode != Gamemode.Creative){
 				ItemEntity itemEntity = new ItemEntity(Level, droppedItem)
 				{
 					Velocity = KnownPosition.GetDirection()*0.7f,
@@ -1639,6 +1642,7 @@ namespace MiNET
 				};
 
 				itemEntity.SpawnEntity();
+				}
 			}
 		}
 
@@ -1651,6 +1655,7 @@ namespace MiNET
 				Item itemStack = message.item;
 				if (GameMode != GameMode.Creative && itemStack != null && !VerifyItemStack(itemStack))
 				{
+				        level.BroadcastMessage("Kicked {Username} for equipment hacking.");
 					Log.Error($"Kicked {Username} for equipment hacking.");
 					Disconnect("Error #376. Please report this error.");
 				}
@@ -1659,16 +1664,6 @@ namespace MiNET
 				int selectedInventorySlot = (byte) (message.slot - PlayerInventory.HotbarSize);
 
 				if (Log.IsDebugEnabled) Log.Debug($"Player {Username} called set equiptment with inv slot: {selectedInventorySlot}({message.slot}) and hotbar slot {message.selectedSlot} with item {message.item}");
-
-				// 255 indicates empty hmmm
-				if (selectedInventorySlot < 0 || (message.slot != 255 && selectedInventorySlot >= Inventory.Slots.Count))
-				{
-					if (GameMode != GameMode.Creative)
-					{
-						Log.Error($"Player {Username} set equiptment fails with inv slot: {selectedInventorySlot}({message.slot}) and hotbar slot {selectedHotbarSlot} for inventory size: {Inventory.Slots.Count} and Item ID: {message.item?.Id}");
-					}
-					return;
-				}
 
 				if (message.slot == 255)
 				{
@@ -1780,6 +1775,9 @@ namespace MiNET
 		public virtual void HandleMcpeCraftingEvent(McpeCraftingEvent message)
 		{
 			Log.Debug($"Player {Username} crafted item on window 0x{message.windowId:X2} on type: {message.recipeType}");
+			if(message.item == null){
+			   SendMessage("Error ! Please report it to admins!");
+			}
 		}
 
 		/// <summary>
